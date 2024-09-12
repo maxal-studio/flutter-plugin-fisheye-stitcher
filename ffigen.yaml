@@ -1,0 +1,19 @@
+# Run with `dart run ffigen --config ffigen.yaml`.
+name: FisheyestitcherBindings
+description: |
+  Bindings for `src/fisheye_stitcher.h`.
+
+  Regenerate bindings with `dart run ffigen --config ffigen.yaml`.
+output: 'lib/fisheye_stitcher_bindings_generated.dart'
+headers:
+  entry-points:
+    - 'src/fisheye_stitcher.h'
+  include-directives:
+    - 'src/fisheye_stitcher.h'
+preamble: |
+  // ignore_for_file: always_specify_types
+  // ignore_for_file: camel_case_types
+  // ignore_for_file: non_constant_identifier_names
+comments:
+  style: any
+  length: full

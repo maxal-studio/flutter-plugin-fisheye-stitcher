@@ -1,0 +1,29 @@
+{
+  "files.associations": {
+    "pthread.h": "c",
+    "dualfish2sphere.h": "c",
+    "ios": "c",
+    "locale": "c",
+    "*.tcc": "c",
+    "functional": "c",
+    "type_traits": "c",
+    "stdlib.h": "c",
+    "random": "c",
+    "__locale": "c",
+    "optional": "c",
+    "jpeglib.h": "c",
+    "fisheye_stitcher.h": "c",
+    "jconfig.h": "c",
+    "bitmaplib.h": "c",
+    "imfcrgbafile.h": "c",
+    "unistd.h": "c",
+    "__bit_reference": "c",
+    "bitset": "c",
+    "map": "c",
+    "set": "c",
+    "unordered_map": "c",
+    "algorithm": "c",
+    "format": "c"
+  },
+  "C_Cpp.errorSquiggles": "disabled"
+}
