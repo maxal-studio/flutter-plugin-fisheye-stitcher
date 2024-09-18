@@ -1,3 +1,7 @@
+## 0.0.2
+
+- Added outHeight parameter
+
 ## 0.0.1
 
-* TODO: Describe initial release.
+- Stitch two fisheye images together into a spherical image.

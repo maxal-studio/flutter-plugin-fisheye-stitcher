@@ -107,7 +107,8 @@ class _MyAppState extends State<MyApp> {
           [ROTATEZ, double.parse(rotateZ2Controller.text)],
         ],
       ),
-      outputWidth: 2000,
+      outputWidth: 4000,
+      outputHeight: 2000,
       enableDebugging: false,
       numberOfOptimizationIterations: 1,
     );

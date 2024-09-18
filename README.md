@@ -48,6 +48,7 @@ StitchingResult stitchingResult =
     ],
   ),
   outputWidth: 2000,
+  outputHeight: 0,
   enableDebugging: false,
   /// If the numberOfOptimizationIterations parameter is greater then 1, the script will start an auto-optimization
   /// process. This will take time (The greater the numberOfOptimizationIterations,

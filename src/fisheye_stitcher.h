@@ -154,7 +154,7 @@ void convert_transforms_to_array(const TRANSFORM *transforms, int transform_coun
 // Create the FFI_PLUGIN_EXPORT for the convert function
 FFI_PLUGIN_EXPORT struct STITCHING_RESULT stitch(
 		struct FISHEYE_PARAMS fisheye_1, struct FISHEYE_PARAMS fisheye_2,
-		char outputPath[512], int outwidth, int antialias,
+		char outputPath[512], int outwidth, int outheight, int antialias,
 		double blendwidth, double blendpower, double blendmid,
 		int noptiterations,
 		double deltafov, int deltacenter, double deltatheta,

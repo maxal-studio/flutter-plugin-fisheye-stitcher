@@ -33,6 +33,7 @@ int main(void)
        fisheye_1,
        fisheye_2,
        "./",
+       0,
        2000,
        2,
        10,
@@ -221,7 +222,7 @@ char *generateRandomName(void)
  */
 struct STITCHING_RESULT stitch(
     struct FISHEYE_PARAMS fisheye_1, struct FISHEYE_PARAMS fisheye_2,
-    char outputPath[512], int outwidth, int antialias,
+    char outputPath[512], int outwidth, int outheight, int antialias,
     double blendwidth, double blendpower, double blendmid,
     int noptiterations,
     double deltafov, int deltacenter, double deltatheta,
@@ -258,11 +259,23 @@ struct STITCHING_RESULT stitch(
    // Outpup Filename
    strcpy(outfilename, generateRandomName());
 
-   // width PARAM
-   params.outwidth = outwidth;
-   params.outwidth /= 4;
-   params.outwidth *= 4;                   // Ensure multiple of 4
-   params.outheight = params.outwidth / 2; // Default for equirectangular images, will be even
+   if (outwidth != 0)
+   {
+      // width PARAM
+      params.outwidth = outwidth;
+      params.outwidth /= 4;
+      params.outwidth *= 4;                   // Ensure multiple of 4
+      params.outheight = params.outwidth / 2; // Default for equirectangular images, will be even
+   }
+   else
+   {
+      // height PARAM
+      params.outheight = outheight;
+      params.outheight /= 4;
+      params.outheight *= 4; // Ensure multiple of 4
+      params.outwidth = params.outheight * 2;
+   }
+
    // antialias PARAM
    params.antialias = antialias < 1 ? 1 : antialias;
    // blendwidth PARAM

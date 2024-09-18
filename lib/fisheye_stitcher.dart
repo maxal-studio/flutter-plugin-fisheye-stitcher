@@ -110,6 +110,8 @@ FISHEYE_PARAMS createFishEyeParams({
 ///
 /// - [outputWidth]: The width of the output image.
 ///
+/// - [outputHeight]: The height of the output image.
+///
 /// - [antiAliasLevel]: The level of antialiasing to use.
 ///
 /// - [blendWidth]: The width of the blending zone in degrees.
@@ -150,8 +152,11 @@ Future<StitchingResult> stitchFisheyeImages({
   /// The second fisheye parameters.
   required FISHEYE_PARAMS fisheye2Parameters,
 
-  /// The width of the output image.
+  /// The width of the output image. (Set to 0 if height is set)
   required int outputWidth,
+
+  /// The height of the output image. (Set to 0 if width is set)
+  required int outputHeight,
 
   /// The amount of antialiasing to use.
   int antiAliasLevel = 1,
@@ -192,12 +197,18 @@ Future<StitchingResult> stitchFisheyeImages({
   // Convert Dart string to Utf8
   Pointer<Char> imagePathPointer = directory.path.toNativeUtf8().cast<Char>();
 
+  // Make sure only width or height is set
+  if (outputHeight != 0) {
+    outputWidth = 0;
+  }
+
   final _StitchingRequest request = _StitchingRequest(
     requestId,
     fisheye1Parameters,
     fisheye2Parameters,
     imagePathPointer,
     outputWidth,
+    outputHeight,
     antiAliasLevel,
     blendWidth,
     blendPower,
@@ -253,6 +264,7 @@ class _StitchingRequest {
   final FISHEYE_PARAMS fisheye2Parameters;
   final Pointer<Char> outputPath;
   final int outputWidth;
+  final int outputHeight;
   final int antiAliasLevel;
   final double blendWidth;
   final double blendPower;
@@ -269,6 +281,7 @@ class _StitchingRequest {
     this.fisheye2Parameters,
     this.outputPath,
     this.outputWidth,
+    this.outputHeight,
     this.antiAliasLevel,
     this.blendWidth,
     this.blendPower,
@@ -328,6 +341,7 @@ Future<SendPort> _helperIsolateSendPort = () async {
             data.fisheye2Parameters,
             data.outputPath,
             data.outputWidth,
+            data.outputHeight,
             data.antiAliasLevel,
             data.blendWidth,
             data.blendPower,
