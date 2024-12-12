@@ -40,6 +40,9 @@ const int ROTATEZ = ZPAN;
 ///
 /// @return A FISHEYE_PARAMS structure, which contains the given parameters.
 FISHEYE_PARAMS createFishEyeParams({
+  /// The height of the image from which the params are generated.
+  required int sampleHeight,
+
   /// imagePath The filename of the fisheye image.
   required String imagePath,
 
@@ -89,6 +92,7 @@ FISHEYE_PARAMS createFishEyeParams({
     vFlip,
     transformValues.cast(), // Pass the contiguous memory block to C
     transform.length,
+    sampleHeight,
   );
 
   // Free allocated memory

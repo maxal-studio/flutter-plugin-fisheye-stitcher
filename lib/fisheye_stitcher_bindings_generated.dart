@@ -292,6 +292,7 @@ class FisheyestitcherBindings {
     int vflip,
     ffi.Pointer<TRANSFORM> transform,
     int ntransform,
+    int sample_height,
   ) {
     return _populateFisheyeStructure(
       nfish,
@@ -304,6 +305,7 @@ class FisheyestitcherBindings {
       vflip,
       transform,
       ntransform,
+      sample_height,
     );
   }
 
@@ -319,11 +321,12 @@ class FisheyestitcherBindings {
               ffi.Int,
               ffi.Int,
               ffi.Pointer<TRANSFORM>,
+              ffi.Int,
               ffi.Int)>>('populateFisheyeStructure');
   late final _populateFisheyeStructure =
       _populateFisheyeStructurePtr.asFunction<
           int Function(int, ffi.Pointer<ffi.Char>, int, int, int, double, int,
-              int, ffi.Pointer<TRANSFORM>, int)>();
+              int, ffi.Pointer<TRANSFORM>, int, int)>();
 
   STITCHING_RESULT createStitchResult(
     bool success,
@@ -363,6 +366,7 @@ class FisheyestitcherBindings {
     int vflip,
     ffi.Pointer<ffi.Pointer<ffi.Double>> transform_values,
     int ntransform,
+    int sample_height,
   ) {
     return _createFishEyeParams(
       fname,
@@ -374,6 +378,7 @@ class FisheyestitcherBindings {
       vflip,
       transform_values,
       ntransform,
+      sample_height,
     );
   }
 
@@ -388,10 +393,11 @@ class FisheyestitcherBindings {
               ffi.Int,
               ffi.Int,
               ffi.Pointer<ffi.Pointer<ffi.Double>>,
+              ffi.Int,
               ffi.Int)>>('createFishEyeParams');
   late final _createFishEyeParams = _createFishEyeParamsPtr.asFunction<
       FISHEYE_PARAMS Function(ffi.Pointer<ffi.Char>, int, int, int, double, int,
-          int, ffi.Pointer<ffi.Pointer<ffi.Double>>, int)>();
+          int, ffi.Pointer<ffi.Pointer<ffi.Double>>, int, int)>();
 
   ffi.Pointer<TRANSFORM> create_transforms(
     ffi.Pointer<ffi.Pointer<ffi.Double>> axis_values,
@@ -665,6 +671,9 @@ final class FISHEYE_PARAMS extends ffi.Struct {
 
   @ffi.Int()
   external int ntransform;
+
+  @ffi.Int()
+  external int sample_height;
 }
 
 final class OPTIMIZED_PARAMS extends ffi.Struct {

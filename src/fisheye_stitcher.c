@@ -23,9 +23,10 @@ int main(void)
    int fisheye_2_transform_counter = sizeof(fisheye_2_transform) / sizeof(fisheye_2_transform[0]);
 
    // Create fisheye structures
-   struct FISHEYE_PARAMS fisheye_1 = createFishEyeParams("sample.jpg", 1475, 1510, 1517, 191.5, 1, 1, fisheye_1_transform, fisheye_1_transform_counter);
-   struct FISHEYE_PARAMS fisheye_2 = createFishEyeParams("sample.jpg", 1485, 4574, 1520, 194.7, 1, 1, fisheye_2_transform, fisheye_2_transform_counter);
+   struct FISHEYE_PARAMS fisheye_1 = createFishEyeParams("sample.jpg", 1475, 1510, 1517, 191.5, 1, 1, fisheye_1_transform, fisheye_1_transform_counter, 3040);
+   struct FISHEYE_PARAMS fisheye_2 = createFishEyeParams("sample.jpg", 1485, 4574, 1520, 194.7, 1, 1, fisheye_2_transform, fisheye_2_transform_counter, 3040);
 
+   int outHeight = 1000;
    int optiterations = 1;
    bool debug = true;
 
@@ -34,7 +35,7 @@ int main(void)
        fisheye_2,
        "./",
        0,
-       2000,
+       outHeight,
        2,
        10,
        0,
@@ -109,10 +110,11 @@ void convert_transforms_to_array(const TRANSFORM *transforms, int transform_coun
  * @param vflip Whether to flip the fisheye image vertically.
  * @param transform_values An array of TRANSFORM structures, describing the transformations to apply to the fisheye image.
  * @param ntransform The number of TRANSFORM structures in the transform array.
+ * @param sample_height The height of the image from which the parameters were sampled.
  *
  * @return A FISHEYE_PARAMS structure, which contains the given parameters.
  */
-struct FISHEYE_PARAMS createFishEyeParams(char fname[256], int radius, int centerx, int centery, double fov, int hflip, int vflip, double transform_values[][2], int ntransform)
+struct FISHEYE_PARAMS createFishEyeParams(char fname[256], int radius, int centerx, int centery, double fov, int hflip, int vflip, double transform_values[][2], int ntransform, int sample_height)
 {
    // Print ntransform to stderr
    fprintf(stderr, "ntransform: %d\n", ntransform);
@@ -132,6 +134,7 @@ struct FISHEYE_PARAMS createFishEyeParams(char fname[256], int radius, int cente
    fisheye.vflip = vflip;
    fisheye.transform = create_transforms(transform_values, ntransform);
    fisheye.ntransform = ntransform;
+   fisheye.sample_height = sample_height;
 
    return fisheye;
 }
@@ -300,13 +303,17 @@ struct STITCHING_RESULT stitch(
    params.blendmid = blendmid * DTOR * 0.5;
 
    // Read parameter for fisheye_1
-   if (!populateFisheyeStructure(0, fisheye_1.fname, fisheye_1.radius, fisheye_1.centerx, fisheye_1.centery, fisheye_1.fov, fisheye_1.hflip, fisheye_1.vflip, fisheye_1.transform, fisheye_1.ntransform))
+   if (!populateFisheyeStructure(0, fisheye_1.fname, fisheye_1.radius, fisheye_1.centerx,
+                                 fisheye_1.centery, fisheye_1.fov, fisheye_1.hflip, fisheye_1.vflip,
+                                 fisheye_1.transform, fisheye_1.ntransform, fisheye_1.sample_height))
    {
       return createStitchResult(false, "Failed to read image for fisheye 1", "", "", optimized_params_struct);
    }
 
    // Read parameter for fisheye_2
-   if (!populateFisheyeStructure(1, fisheye_2.fname, fisheye_2.radius, fisheye_2.centerx, fisheye_2.centery, fisheye_2.fov, fisheye_2.hflip, fisheye_2.vflip, fisheye_2.transform, fisheye_2.ntransform))
+   if (!populateFisheyeStructure(1, fisheye_2.fname, fisheye_2.radius, fisheye_2.centerx,
+                                 fisheye_2.centery, fisheye_2.fov, fisheye_2.hflip, fisheye_2.vflip,
+                                 fisheye_2.transform, fisheye_2.ntransform, fisheye_2.sample_height))
    {
       return createStitchResult(false, "Failed to read image for fisheye 2", "", "", optimized_params_struct);
    }
@@ -483,8 +490,8 @@ struct STITCHING_RESULT stitch(
 
          // Update optimized params with the new values
          optimized_params_struct = (struct OPTIMIZED_PARAMS){
-             .fishey1_params = createFishEyeParams(fisheye[0].fname, fisheye[0].radius, fisheye[0].centerx, fisheye[0].height - 1 - fisheye[0].centery, fisheye[0].fov * 2 * RTOD, fisheye[0].hflip, fisheye[0].vflip, fisheye_1_transform, fisheye_1_transform_count),
-             .fishey2_params = createFishEyeParams(fisheye[1].fname, fisheye[1].radius, fisheye[1].centerx, fisheye[1].height - 1 - fisheye[1].centery, fisheye[1].fov * 2 * RTOD, fisheye[1].hflip, fisheye[1].vflip, fisheye_2_transform, fisheye_2_transform_count),
+             .fishey1_params = createFishEyeParams(fisheye[0].fname, fisheye[0].radius, fisheye[0].centerx, fisheye[0].height - 1 - fisheye[0].centery, fisheye[0].fov * 2 * RTOD, fisheye[0].hflip, fisheye[0].vflip, fisheye_1_transform, fisheye_1_transform_count, fisheye[0].height),
+             .fishey2_params = createFishEyeParams(fisheye[1].fname, fisheye[1].radius, fisheye[1].centerx, fisheye[1].height - 1 - fisheye[1].centery, fisheye[1].fov * 2 * RTOD, fisheye[1].hflip, fisheye[1].vflip, fisheye_2_transform, fisheye_2_transform_count, fisheye[1].height),
          };
 
          // Write image so far, will just be the blend strip
@@ -800,10 +807,12 @@ void printOptimizedParams(struct OPTIMIZED_PARAMS optimized_params)
  * @param vflip Whether to flip the fisheye image vertically.
  * @param transform An array of TRANSFORM structures, describing the transformations to apply to the fisheye image.
  * @param ntransform The number of TRANSFORM structures in the transform array.
+ * @param sample_height The height of the image from which the parameters were sampled.
  *
  * @return TRUE if the image was read successfully, FALSE otherwise.
  */
-int populateFisheyeStructure(int nfish, char fname[256], int radius, int centerx, int centery, double fov, int hflip, int vflip, TRANSFORM *transform, int ntransform)
+int populateFisheyeStructure(int nfish, char fname[256], int radius, int centerx, int centery,
+                             double fov, int hflip, int vflip, TRANSFORM *transform, int ntransform, int sample_height)
 {
    int w, h, d;
    FILE *fimg;
@@ -822,6 +831,22 @@ int populateFisheyeStructure(int nfish, char fname[256], int radius, int centerx
       JPEG_Info(fimg, &fisheye[nfish].width, &fisheye[nfish].height, &d);
    else
       TGA_Info(fimg, &fisheye[nfish].width, &fisheye[nfish].height, &d);
+
+   // Scale the parameters if the image height is different from the sample height
+   double scale_factor = 1.0;
+   if (sample_height > 0)
+   {
+      scale_factor = (double)fisheye[nfish].height / sample_height;
+
+      // Scale the parameters
+      radius = (int)(radius * scale_factor);
+      centerx = (int)(centerx * scale_factor);
+      centery = (int)(centery * scale_factor);
+
+      fprintf(stderr, "Scaling parameters by factor %f (sample height: %d, new height: %d)\n",
+              scale_factor, sample_height, fisheye[nfish].height);
+   }
+
    // Create image
    fisheye[nfish].image = Create_Bitmap(fisheye[nfish].width, fisheye[nfish].height);
    if (params.fileformat == JPG)
@@ -841,19 +866,18 @@ int populateFisheyeStructure(int nfish, char fname[256], int radius, int centerx
       }
    }
    fclose(fimg);
-   // Radius
+
+   // Set the scaled parameters
    fisheye[nfish].radius = radius;
-   // Center point
    fisheye[nfish].centerx = centerx;
    fisheye[nfish].centery = centery;
-   // FOV
    fisheye[nfish].fov = fov;
-   // Flip
+
    if (hflip < 0)
       fisheye[nfish].hflip = -1;
    else
       fisheye[nfish].hflip = 1;
-   // VFlip
+
    if (vflip < 0)
       fisheye[nfish].vflip = -1;
    else

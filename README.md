@@ -20,6 +20,7 @@ import 'package:fisheye_stitcher/fisheye_stitcher.dart';
 StitchingResult stitchingResult =
     await fisheye_stitcher.stitchFisheyeImages(
   fisheye1Parameters: fisheye_stitcher.createFishEyeParams(
+    sampleHeight: int, // The height of the image from which the params are generated
     imagePath: image.path,
     radius: int,
     centerX: int,
@@ -36,6 +37,7 @@ StitchingResult stitchingResult =
     ],
   ),
   fisheye2Parameters: fisheye_stitcher.createFishEyeParams(
+    sampleHeight: int, // The height of the image from which the params are generated
     imagePath: image.path,
     radius: int,
     centerX: int,
@@ -69,6 +71,15 @@ To generate the params, use photoshop
 
 ## DEMO (Example App)
 ![DEMO (Example App)](./doc/demo.jpg)
+
+# Developers Documentation
+You can run the stitcher app directly from the src folder to test it out.
+```
+cd src
+make fisheye_stitcher   
+./fisheye_stitcher    
+```
+
 
 # License
 

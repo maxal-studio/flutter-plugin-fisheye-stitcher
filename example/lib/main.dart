@@ -24,6 +24,8 @@ class _MyAppState extends State<MyApp> {
   final ImagePicker _picker = ImagePicker();
 
   // Controllers for fisheye 1 parameters
+  final TextEditingController sampleHeight1Controller =
+      TextEditingController(text: '3040');
   final TextEditingController radius1Controller =
       TextEditingController(text: '1475');
   final TextEditingController centerX1Controller =
@@ -40,6 +42,8 @@ class _MyAppState extends State<MyApp> {
       TextEditingController(text: '1.7');
 
   // Controllers for fisheye 2 parameters
+  final TextEditingController sampleHeight2Controller =
+      TextEditingController(text: '3040');
   final TextEditingController radius2Controller =
       TextEditingController(text: '1485');
   final TextEditingController centerX2Controller =
@@ -85,6 +89,7 @@ class _MyAppState extends State<MyApp> {
     StitchingResult stitchingResult = await stitchFisheyeImages(
       fisheye1Parameters: createFishEyeParams(
         imagePath: image.path,
+        sampleHeight: int.parse(sampleHeight1Controller.text),
         radius: int.parse(radius1Controller.text),
         centerX: int.parse(centerX1Controller.text),
         centerY: int.parse(centerY1Controller.text),
@@ -97,6 +102,7 @@ class _MyAppState extends State<MyApp> {
       ),
       fisheye2Parameters: createFishEyeParams(
         imagePath: image.path,
+        sampleHeight: int.parse(sampleHeight2Controller.text),
         radius: int.parse(radius2Controller.text),
         centerX: int.parse(centerX2Controller.text),
         centerY: int.parse(centerY2Controller.text),
@@ -138,6 +144,12 @@ class _MyAppState extends State<MyApp> {
                     Expanded(
                       child: Column(
                         children: [
+                          TextField(
+                            controller: sampleHeight1Controller,
+                            decoration: const InputDecoration(
+                                labelText: 'Sample Height'),
+                            keyboardType: TextInputType.number,
+                          ),
                           TextField(
                             controller: radius1Controller,
                             decoration:
@@ -187,6 +199,12 @@ class _MyAppState extends State<MyApp> {
                     Expanded(
                       child: Column(
                         children: [
+                          TextField(
+                            controller: sampleHeight2Controller,
+                            decoration: const InputDecoration(
+                                labelText: 'Sample Height'),
+                            keyboardType: TextInputType.number,
+                          ),
                           TextField(
                             controller: radius2Controller,
                             decoration:

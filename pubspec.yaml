@@ -1,6 +1,6 @@
 name: fisheye_stitcher
-description: "A new Flutter FFI plugin project."
-version: 0.0.2
+description: "A flutter plugin for stitching fisheye images"
+version: 0.0.3
 homepage:
 
 environment:

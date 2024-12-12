@@ -77,6 +77,7 @@ struct FISHEYE_PARAMS
 	int vflip;
 	TRANSFORM *transform;
 	int ntransform;
+	int sample_height;
 };
 
 struct OPTIMIZED_PARAMS
@@ -143,9 +144,9 @@ void FlipFisheye(FISHEYE);
 XYZ RotateX(XYZ, double);
 XYZ RotateY(XYZ, double);
 XYZ RotateZ(XYZ, double);
-int populateFisheyeStructure(int nfish, char fname[256], int radius, int centerx, int centery, double fov, int hflip, int vflip, TRANSFORM *transform, int ntransform);
+int populateFisheyeStructure(int nfish, char fname[256], int radius, int centerx, int centery, double fov, int hflip, int vflip, TRANSFORM *transform, int ntransform, int sample_height);
 struct STITCHING_RESULT createStitchResult(bool success, char message[512], char image[512], char optimized_image[512], struct OPTIMIZED_PARAMS optimized_params);
-struct FISHEYE_PARAMS createFishEyeParams(char fname[256], int radius, int centerx, int centery, double fov, int hflip, int vflip, double transform_values[][2], int ntransform);
+struct FISHEYE_PARAMS createFishEyeParams(char fname[256], int radius, int centerx, int centery, double fov, int hflip, int vflip, double transform_values[][2], int ntransform, int sample_height);
 TRANSFORM *create_transforms(double axis_values[][2], int count);
 void printFisheyeParams(struct FISHEYE_PARAMS fisheye_params);
 void printOptimizedParams(struct OPTIMIZED_PARAMS optimized_params);
