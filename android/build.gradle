@@ -11,7 +11,7 @@ buildscript {
 
     dependencies {
         // The Android Gradle Plugin knows how to build native code with the NDK.
-        classpath("com.android.tools.build:gradle:7.3.0")
+        classpath("com.android.tools.build:gradle:8.11.1")
     }
 }
 
@@ -25,13 +25,11 @@ rootProject.allprojects {
 apply plugin: "com.android.library"
 
 android {
-    if (project.android.hasProperty("namespace")) {
-        namespace = "com.example.fisheye_stitcher"
-    }
+    namespace = "com.example.fisheye_stitcher"
 
     // Bumping the plugin compileSdk version requires all clients of this plugin
     // to bump the version in their app.
-    compileSdk = 34
+    compileSdk = 36
 
     // Use the NDK version
     // declared in /android/app/build.gradle file of the Flutter project.
@@ -55,18 +53,32 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     defaultConfig {
         minSdk = 21
+
+        // Android 15+ requires native libraries to use a 16 KB max page
+        // size so that LOAD segments are aligned to 0x4000. Pass the flag
+        // explicitly so we are 16 KB compliant even when the host app uses
+        // an older NDK (NDK r28+ does this by default).
+        // See: https://developer.android.com/16kb-page-size
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+                cppFlags ""
+                cFlags ""
+            }
+        }
     }
 
-    buildTypes {
-        debug {
-            ext.enableV2Signing = true
-            ext.enableDebugLogging = true
+    // Keep the 16 KB ELF alignment that the linker just produced - the
+    // legacy JNI packager re-pages .so files to 4 KB on extraction.
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
         }
     }
 }

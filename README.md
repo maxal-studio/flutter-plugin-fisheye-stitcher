@@ -2,13 +2,11 @@
 
 A Dart plugin for stitching dual fisheye images into a spherical (equirectangular) image.
 
-
 # Features
 
 - Stitch fisheye images with ease
 - Set the belding width, in order to fade out the stitching errors
 - Auto optimization of the parameters
-
 
 ## Example
 
@@ -28,7 +26,7 @@ StitchingResult stitchingResult =
     fov: double,
     /// The transform array is needed only if the camera lenese need correction
     /// Usually they do, as it's almost impossible for the camera factories to align the lenses perfectly
-    /// In the transform array you can pass multiple rotations in different order 
+    /// In the transform array you can pass multiple rotations in different order
     /// (This is helpful if you use the optimization function, that will generate new parameters and rotations)
     transform: [
       [ROTATEY, double],
@@ -70,16 +68,40 @@ To generate the params, use photoshop
     - fov, is the cameras field of view
 
 ## DEMO (Example App)
+
 ![DEMO (Example App)](./doc/demo.jpg)
 
 # Developers Documentation
-You can run the stitcher app directly from the src folder to test it out.
-```
-cd src
-make fisheye_stitcher   
-./fisheye_stitcher    
+
+## Clone and run the example app (Android)
+
+The Android build depends on [libjpeg-turbo](https://github.com/libjpeg-turbo/libjpeg-turbo), which is included as a git submodule at the repo root. iOS and macOS bundle their own copy, but Android (and Linux/Windows) build it from this submodule during compilation.
+
+After cloning, initialize the submodule:
+
+```bash
+git submodule update --init --recursive
 ```
 
+Then run the example app:
+
+```bash
+cd example
+flutter pub get
+flutter run
+```
+
+You also need a working Flutter/Android setup (Android SDK, NDK, and a device or emulator). The first Android build can take a few minutes while libjpeg-turbo is compiled.
+
+## Native CLI (src)
+
+You can run the stitcher app directly from the src folder to test it out.
+
+```bash
+cd src
+make fisheye_stitcher
+./fisheye_stitcher
+```
 
 # License
 

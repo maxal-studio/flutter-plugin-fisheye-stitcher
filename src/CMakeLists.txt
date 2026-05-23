@@ -27,7 +27,20 @@ get_property(CMAKE_RUNTIME_OUTPUT_DIRECTORY GLOBAL PROPERTY CMAKE_RUNTIME_OUTPUT
 get_property(CMAKE_BUILD_TYPE GLOBAL PROPERTY CMAKE_BUILD_TYPE)
 
 
-# Set up libjpeg-turbo as an external project
+# Android 15 (API 35) requires shared libraries to be aligned to a 16 KB
+# page size. Pass -Wl,-z,max-page-size=16384 to the linker for every binary
+# we build so the LOAD segments are aligned correctly even when the host
+# app is built with an older NDK that defaults to 4 KB pages (NDK < r28).
+set(PAGE_SIZE_16KB_LINKER_FLAGS "-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384")
+
+# Set up libjpeg-turbo as an external project.
+#
+# We link libjpeg-turbo statically (libjpeg.a / libturbojpeg.a) so there is
+# no need to also build the shared variants. Disabling ENABLE_SHARED keeps
+# unused, 4 KB-aligned libturbojpeg.so / libjpeg.so out of the final APK,
+# which is what triggers the Play Store / Android 15 "ELF alignment check
+# failed" warning. CMAKE_POSITION_INDEPENDENT_CODE is required so the
+# static archive can be linked into our shared plugin library.
 ExternalProject_Add(
   libjpeg_turbo
   SOURCE_DIR ${LIBJPEG_TURBO_DIR}
@@ -42,9 +55,12 @@ ExternalProject_Add(
     -DANDROID_NDK=${ANDROID_NDK}
     -DCMAKE_ANDROID_NDK=${CMAKE_ANDROID_NDK}
     -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
-    -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-    -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+    -DENABLE_SHARED=0
+    -DENABLE_STATIC=1
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    -DCMAKE_SHARED_LINKER_FLAGS=${PAGE_SIZE_16KB_LINKER_FLAGS}
+    -DCMAKE_EXE_LINKER_FLAGS=${PAGE_SIZE_16KB_LINKER_FLAGS}
   BUILD_ALWAYS 1
   BUILD_BYPRODUCTS 
     ${LIBJPEG_TURBO_INSTALL_DIR}/lib/libturbojpeg.a
@@ -61,6 +77,14 @@ add_library(${PROJECT_NAME} SHARED
 set_target_properties(${PROJECT_NAME} PROPERTIES
   PUBLIC_HEADER "fisheye_stitcher.h"
   OUTPUT_NAME "fisheye_stitcher"
+)
+
+# Force 16 KB-aligned LOAD segments in libfisheye_stitcher.so so the plugin
+# is compatible with Android 15's 16 KB page size requirement regardless of
+# the NDK version used by the host app.
+target_link_options(${PROJECT_NAME} PRIVATE
+  "-Wl,-z,max-page-size=16384"
+  "-Wl,-z,common-page-size=16384"
 )
 
 # Make sure libjpeg-turbo is built before your plugin
