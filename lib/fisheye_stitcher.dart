@@ -232,10 +232,27 @@ Future<StitchingResult> stitchFisheyeImages({
 
 const String _libName = 'fisheye_stitcher';
 
+String _appleSpmFrameworkPath(String libName) {
+  // Flutter SPM replaces "_" with "-" in the library product name.
+  final frameworkName =
+      libName.contains('_') ? libName.replaceAll('_', '-') : libName;
+  return '$frameworkName.framework/$frameworkName';
+}
+
 /// The dynamic library in which the symbols for [FisheyestitcherBindings] can be found.
 final DynamicLibrary _dylib = () {
   if (Platform.isMacOS || Platform.isIOS) {
-    return DynamicLibrary.open('$_libName.framework/$_libName');
+    for (final path in [
+      '$_libName.framework/$_libName', // CocoaPods
+      _appleSpmFrameworkPath(_libName), // Swift Package Manager
+    ]) {
+      try {
+        return DynamicLibrary.open(path);
+      } on ArgumentError {
+        // Try the next known Apple packaging layout.
+      }
+    }
+    return DynamicLibrary.process();
   }
   if (Platform.isAndroid || Platform.isLinux) {
     return DynamicLibrary.open('lib$_libName.so');

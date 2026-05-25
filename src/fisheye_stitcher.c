@@ -4,6 +4,7 @@ FISHEYE fisheye[2];        // Input fisheye
 PARAMS params;             // General parameters
 BITMAP4 *spherical = NULL; // Output image
 
+#ifndef FISHEYE_STITCHER_PLUGIN
 int main(void)
 {
    // Transforms for fisheye1
@@ -60,6 +61,7 @@ int main(void)
 
    return 0;
 }
+#endif
 
 // Function to parse user input and create a list of transforms
 TRANSFORM *create_transforms(double axis_values[][2], int count)

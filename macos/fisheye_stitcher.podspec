@@ -18,9 +18,9 @@ A new Flutter FFI plugin project.
   # paths, so Classes contains a forwarder C file that relatively imports
   # `../src/*` so that the C sources can be shared among all target platforms.
   s.source           = { :path => '.' }
-  s.source_files = ['Classes/**/*', 'libjpeg-turbo/**/*']
+  s.source_files = ['fisheye_stitcher/Sources/fisheye_stitcher/**/*', 'libjpeg-turbo/**/*']
   s.exclude_files = ['libjpeg-turbo/{jstdhuff,jdmrgext,jdmrg565,jccolext,jdcolext,jdcol565}.c','libjpeg-turbo/LICENSE.md']
-  s.public_header_files = ['Classes/**/*.h', 'libjpeg-turbo/**/*.h']
+  s.public_header_files = ['fisheye_stitcher/Sources/fisheye_stitcher/include/**/*.h', 'libjpeg-turbo/**/*.h']
   s.dependency 'FlutterMacOS'
 
   s.platform = :osx, '10.11'

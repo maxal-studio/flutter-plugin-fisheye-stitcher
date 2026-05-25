@@ -21,8 +21,11 @@
 
 #if _WIN32
 #define FFI_PLUGIN_EXPORT __declspec(dllexport)
+#elif defined(__APPLE__)
+#define FFI_PLUGIN_EXPORT \
+  __attribute__((visibility("default"))) __attribute__((used))
 #else
-#define FFI_PLUGIN_EXPORT
+#define FFI_PLUGIN_EXPORT __attribute__((visibility("default")))
 #endif
 
 #define ABS(x) (x < 0 ? -(x) : (x))
@@ -124,7 +127,9 @@ struct STITCHING_RESULT
 #define ZPAN 2	// z
 
 // Prototypes
+#ifndef FISHEYE_STITCHER_PLUGIN
 int main(void);
+#endif
 void initRandomNumberGenerator(void);
 char *generateRandomName(void);
 void InitFisheye(FISHEYE *);
