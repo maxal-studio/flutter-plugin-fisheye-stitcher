@@ -543,6 +543,83 @@ class FisheyestitcherBindings {
           double,
           bool,
           bool)>();
+
+  /// Out-parameter wrapper; prefer this over [stitch] from Dart on Apple.
+  void fisheye_stitch(
+    FISHEYE_PARAMS fisheye_1,
+    FISHEYE_PARAMS fisheye_2,
+    ffi.Pointer<ffi.Char> outputPath,
+    int outwidth,
+    int outheight,
+    int antialias,
+    double blendwidth,
+    double blendpower,
+    double blendmid,
+    int noptiterations,
+    double deltafov,
+    int deltacenter,
+    double deltatheta,
+    bool icorrection,
+    bool debug,
+    ffi.Pointer<STITCHING_RESULT> out_result,
+  ) {
+    return _fisheye_stitch(
+      fisheye_1,
+      fisheye_2,
+      outputPath,
+      outwidth,
+      outheight,
+      antialias,
+      blendwidth,
+      blendpower,
+      blendmid,
+      noptiterations,
+      deltafov,
+      deltacenter,
+      deltatheta,
+      icorrection,
+      debug,
+      out_result,
+    );
+  }
+
+  late final _fisheye_stitchPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              FISHEYE_PARAMS,
+              FISHEYE_PARAMS,
+              ffi.Pointer<ffi.Char>,
+              ffi.Int,
+              ffi.Int,
+              ffi.Int,
+              ffi.Double,
+              ffi.Double,
+              ffi.Double,
+              ffi.Int,
+              ffi.Double,
+              ffi.Int,
+              ffi.Double,
+              ffi.Bool,
+              ffi.Bool,
+              ffi.Pointer<STITCHING_RESULT>)>>('fisheye_stitch');
+  late final _fisheye_stitch = _fisheye_stitchPtr.asFunction<
+      void Function(
+          FISHEYE_PARAMS,
+          FISHEYE_PARAMS,
+          ffi.Pointer<ffi.Char>,
+          int,
+          int,
+          int,
+          double,
+          double,
+          double,
+          int,
+          double,
+          int,
+          double,
+          bool,
+          bool,
+          ffi.Pointer<STITCHING_RESULT>)>();
 }
 
 final class TRANSFORM extends ffi.Struct {

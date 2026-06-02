@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:fisheye_stitcher/models/stitching_result.dart';
-import 'package:fisheye_stitcher_example/optimized_params.dart';
+import 'optimized_params.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:fisheye_stitcher/fisheye_stitcher.dart';

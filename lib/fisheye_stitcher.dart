@@ -235,7 +235,14 @@ const String _libName = 'fisheye_stitcher';
 /// The dynamic library in which the symbols for [FisheyestitcherBindings] can be found.
 final DynamicLibrary _dylib = () {
   if (Platform.isMacOS || Platform.isIOS) {
-    return DynamicLibrary.open('$_libName.framework/$_libName');
+    // Resolve from the running process rather than a specific framework file.
+    // Works when the plugin is bundled as its own dynamic
+    // `fisheye_stitcher.framework` (hosts using `use_frameworks!`) and when it
+    // is statically linked into the host executable (hosts using
+    // `use_frameworks! :linkage => :static`), where no standalone framework
+    // exists. In the static case the host must force-load the plugin so its
+    // symbols are present in the executable's dynamic symbol table.
+    return DynamicLibrary.process();
   }
   if (Platform.isAndroid || Platform.isLinux) {
     return DynamicLibrary.open('lib$_libName.so');
@@ -340,27 +347,35 @@ Future<SendPort> _helperIsolateSendPort = () async {
       ..listen((dynamic data) async {
         // On the helper isolate listen to requests and respond to them.
         if (data is _StitchingRequest) {
-          final STITCHING_RESULT result = _bindings.stitch(
-            data.fisheye1Parameters,
-            data.fisheye2Parameters,
-            data.outputPath,
-            data.outputWidth,
-            data.outputHeight,
-            data.antiAliasLevel,
-            data.blendWidth,
-            data.blendPower,
-            data.blendMidpoint,
-            data.numberOfOptimizationIterations,
-            data.deltafov,
-            data.deltacenter,
-            data.deltatheta,
-            data.applyInverseCorrection,
-            data.enableDebugging,
-          );
+          final resultPtr = calloc<STITCHING_RESULT>();
+          try {
+            _bindings.fisheye_stitch(
+              data.fisheye1Parameters,
+              data.fisheye2Parameters,
+              data.outputPath,
+              data.outputWidth,
+              data.outputHeight,
+              data.antiAliasLevel,
+              data.blendWidth,
+              data.blendPower,
+              data.blendMidpoint,
+              data.numberOfOptimizationIterations,
+              data.deltafov,
+              data.deltacenter,
+              data.deltatheta,
+              data.applyInverseCorrection,
+              data.enableDebugging,
+              resultPtr,
+            );
 
-          final _StitchingResponse response =
-              _StitchingResponse(data.id, convertStitchingResult(result));
-          sendPort.send(response);
+            final _StitchingResponse response = _StitchingResponse(
+              data.id,
+              convertStitchingResult(resultPtr.ref),
+            );
+            sendPort.send(response);
+          } finally {
+            calloc.free(resultPtr);
+          }
           return;
         }
         throw UnsupportedError('Unsupported message type: ${data.runtimeType}');

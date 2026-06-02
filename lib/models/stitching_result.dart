@@ -153,8 +153,9 @@ String _convertArrayToString(ffi.Array<ffi.Char> array, {int maxLength = 512}) {
 
   for (int i = 0; i < maxLength; i++) {
     final int char = array[i];
-    if (char == 0) break; // Stop at null terminator
-    codeUnits.add(char);
+    if (char == 0) break;
+    // C char is signed; treat bytes as unsigned Latin-1.
+    codeUnits.add(char & 0xFF);
   }
 
   return String.fromCharCodes(codeUnits);

@@ -124,7 +124,10 @@ struct STITCHING_RESULT
 #define ZPAN 2	// z
 
 // Prototypes
-int main(void);
+// Renamed from `main`: this is a standalone self-test/CLI entry point, but a
+// library must not define `main` or it collides with the host app's `_main`
+// when the plugin is statically linked into the executable.
+int fisheye_stitcher_selftest(void);
 void initRandomNumberGenerator(void);
 char *generateRandomName(void);
 void InitFisheye(FISHEYE *);
@@ -160,5 +163,17 @@ FFI_PLUGIN_EXPORT struct STITCHING_RESULT stitch(
 		int noptiterations,
 		double deltafov, int deltacenter, double deltatheta,
 		bool icorrection, bool debug);
+
+// Out-parameter wrapper for Dart FFI. Returning the large STITCHING_RESULT struct
+// by value from a dynamic library is unreliable on Apple platforms; writing into
+// caller-allocated memory avoids the sret ABI mismatch that corrupts fields.
+FFI_PLUGIN_EXPORT void fisheye_stitch(
+		struct FISHEYE_PARAMS fisheye_1, struct FISHEYE_PARAMS fisheye_2,
+		char outputPath[512], int outwidth, int outheight, int antialias,
+		double blendwidth, double blendpower, double blendmid,
+		int noptiterations,
+		double deltafov, int deltacenter, double deltatheta,
+		bool icorrection, bool debug,
+		struct STITCHING_RESULT *out_result);
 
 #endif // FISHEYE_STITCHER_H

@@ -13,21 +13,17 @@ A new Flutter FFI plugin project.
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
 
-  # This will ensure the source files in Classes/ are included in the native
-  # builds of apps using this FFI plugin. Podspec does not support relative
-  # paths, so Classes contains a forwarder C file that relatively imports
-  # `../src/*` so that the C sources can be shared among all target platforms.
+  # The native C sources (src/ + libjpeg-turbo) are precompiled into a dynamic
+  # `fisheye_stitcher.xcframework` by tool/build_apple_xcframework.sh and
+  # vendored here. Shipping a dynamic framework (instead of building from
+  # source) means CocoaPods embeds it as-is even when the host app uses
+  # `use_frameworks! :linkage => :static`, so the FFI symbols are always present
+  # in the process for `DynamicLibrary.process()`. Re-run the build script after
+  # changing any C source.
   s.source           = { :path => '.' }
-  s.source_files = ['Classes/**/*', 'libjpeg-turbo/**/*']
-  s.exclude_files = ['libjpeg-turbo/{jstdhuff,jdmrgext,jdmrg565,jccolext,jdcolext,jdcol565}.c','libjpeg-turbo/LICENSE.md']
-  s.public_header_files = ['Classes/**/*.h', 'libjpeg-turbo/**/*.h']
+  s.vendored_frameworks = 'fisheye_stitcher.xcframework'
   s.dependency 'FlutterMacOS'
 
-  s.platform = :osx, '10.11'
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES' }
+  s.platform = :osx, '10.13'
   s.swift_version = '5.0'
 end
-
-
-
-

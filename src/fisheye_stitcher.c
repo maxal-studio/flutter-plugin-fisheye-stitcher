@@ -4,7 +4,7 @@ FISHEYE fisheye[2];        // Input fisheye
 PARAMS params;             // General parameters
 BITMAP4 *spherical = NULL; // Output image
 
-int main(void)
+int fisheye_stitcher_selftest(void)
 {
    // Transforms for fisheye1
    double fisheye_1_transform[][2] = {
@@ -538,6 +538,24 @@ struct STITCHING_RESULT stitch(
    else
    {
       return createStitchResult(false, "Failed creating output image", "", "", optimized_params_struct);
+   }
+}
+
+FFI_PLUGIN_EXPORT void fisheye_stitch(
+    struct FISHEYE_PARAMS fisheye_1, struct FISHEYE_PARAMS fisheye_2,
+    char outputPath[512], int outwidth, int outheight, int antialias,
+    double blendwidth, double blendpower, double blendmid,
+    int noptiterations,
+    double deltafov, int deltacenter, double deltatheta,
+    bool icorrection, bool debug,
+    struct STITCHING_RESULT *out_result)
+{
+   if (out_result != NULL)
+   {
+      *out_result = stitch(
+          fisheye_1, fisheye_2, outputPath, outwidth, outheight, antialias,
+          blendwidth, blendpower, blendmid, noptiterations,
+          deltafov, deltacenter, deltatheta, icorrection, debug);
    }
 }
 
